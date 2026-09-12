@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://pucci-07.github.io/al-folio/sitemap.xml
+Sitemap: https://pucci-07.github.io/sitemap.xml
