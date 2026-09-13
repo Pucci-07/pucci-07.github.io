@@ -46,4 +46,4 @@ I'm a Togolese cybersecurity student, fascinated by the world of computers and, 
 </ul>
 
 My social media connections:
-- [Linkdin](https://www.linkedin.com/in/tchamiye-lidao-tchendie-881228374/)
+[Linkedin](https://www.linkedin.com/in/tchamiye-lidao-tchendie-881228374/)
