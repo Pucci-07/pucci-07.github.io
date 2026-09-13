@@ -25,8 +25,7 @@ latest_posts:
   scrollable: true # adds a vertical scroll bar if there are more than 3 new posts items
   limit: 3 # leave blank to include all the blog posts
 ---
-
-My name is TCHENDIE Tchamiye Lidao 
+My name is TCHENDIE Tchamiye Lidao
 I'm a Togolese cybersecurity student, fascinated by the world of computers and, more specifically, by cybersecurity. I have a strong pull toward the offensive side of the field — though I'm still finding my way there — but really, I'm drawn to everything that revolves around the Linux world. I've used Linux daily since the first year of my university studies and pick up new systems quickly. I'm also getting into cloud and, to a lesser extent, DevOps.
 
 <div class="badges" style="margin: 1rem 0;">
