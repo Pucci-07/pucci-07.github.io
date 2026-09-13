@@ -1,8 +1,8 @@
 cv:
   name: TCHENDIE TCHAMIYE Lidao
   label: Cybersecurity Student | Aspiring Pentester & Red Teamer
-  email: tchendieyves@gmail.com
-  location: "Hédzranamoé - Lomé, Togo"
+  email: "tchendieyves@gmail.com"
+  location: "Lomé, Togo"
   image: ""
   summary: Togolese cybersecurity student fascinated by the offensive side of security, with a strong daily footing in the Linux world and a growing interest in cloud and DevOps. Aspiring Penetration Tester / Red Teamer / Cloud Security Engineer / System Administrator.
 
@@ -18,7 +18,7 @@ cv:
         location: Togo
         area: Cybersecurity
         studyType: Licence (Bachelor)
-        start_date: "15 October 2024"
+        start_date: "2024-10-15"
         end_date: present
         highlights:
           - Currently in 2nd year, focused on offensive/defensive security, Linux systems, and cloud fundamentals
@@ -27,14 +27,14 @@ cv:
       - company: Solutech Consulting
         position: Cybersecurity Trainer
         location: Togo
-        start_date: "27 jully 2026"
-        end_date: "10 August 2026"
+        start_date: "2026-07-27"
+        end_date: "2026-08-10"
         summary: Designed and delivered a multi-session cybersecurity training program (OS Hardening, Network Filtering, Cloud & OT Security) for a senior IT professional with 17 years of experience.
         highlights:
           - Built training materials in multiple formats (slides, interactive documentation, hands-on labs)
           - Designed a multi-axis lab environment (Filtering/Hardening/Active Directory/Cloud) combining VMs, real cloud sandboxes, and Docker
 
-      - company: Independent / Team project
+      - company: Independent Team / Student project 
         position: Network Security Project — pfSense Deployment
         location: Togo
         start_date: 2024
@@ -57,20 +57,22 @@ cv:
       - title: 1st Place — IPNET Cybersec Club CyberBattle 2026
         authors:
           - Team "Chibrax2000"
-        date: "22 August 2026"
+        date: "2026-08-22"
         awarder: IPNET Cyber Club
         summary: Won a 24-hour non-stop CTF (lock picking, web arena, steganography without AI, code review, jeopardy CTF) as part of a 3-person team.
       
-      -title: 1st Place - IPNET JPOPE 
-       authors : 
-         - [TCHANGAI magnim grace](https://www.linkedin.com/in/magnim-gr%C3%A2ce-tchangai-6b3569345/)
-         - [NAKORE yendoubouame joseph](https://www.linkedin.com/in/yendoubouame-joseph-nakore-a25413333/)
-         - [TCHENDIE Tchamiye Lidao, me](https://www.linkedin.com/in/tchamiye-lidao-tchendie-881228374/)
-       date: "29 August 2026"
-       awarder: IPNET INSTITUTE OF TECHNOLOGY 
-       summary: Pitched [my professionnal student project](https://pucci-07.github.io/projects/1_project/) live in front of recruiters, industry partners, and
-          the public at JPOPE, IPNET's flagship annual student showcase and walked away with the 1st prize in the Cybersecurity track.
-
+       - title: 1st Place - IPNET JPOPE
+        authors:
+          - "[Magnim Grâce TCHANGAI](https://www.linkedin.com/in/magnim-gr%C3%A2ce-tchangai-6b3569345/)"
+          - "[Yendoubouame Joseph NAKORE](https://www.linkedin.com/in/yendoubouame-joseph-nakore-a25413333/)"
+          - "[TCHENDIE TCHAMIYE Lidao](https://www.linkedin.com/in/tchamiye-lidao-tchendie-881228374/)"
+        date: "2026-08-29"
+        awarder: IPNET Institute of Technology
+        summary: >
+          Pitched [my professional student project](https://pucci-07.github.io/projects/1_project/)
+          live in front of recruiters, industry partners, and the public at JPOPE,
+          IPNET's flagship annual student showcase — and walked away with 1st prize
+          in the Cybersecurity track.
     
     Skills:
       - name: Systems & Networking
