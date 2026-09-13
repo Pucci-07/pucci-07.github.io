@@ -14,7 +14,7 @@ cv:
 
   sections:
     Education:
-      - institution: "IPNET INSTITUTE OF TECHNOLOGY"
+      - institution: "IPNET Institute of Technology"
         location: Togo
         area: Cybersecurity
         studyType: Licence (Bachelor)
@@ -34,7 +34,7 @@ cv:
           - Built training materials in multiple formats (slides, interactive documentation, hands-on labs)
           - Designed a multi-axis lab environment (Filtering/Hardening/Active Directory/Cloud) combining VMs, real cloud sandboxes, and Docker
 
-      - company: Independent Team / Student project 
+      - company: Independent Team / Student project
         position: Network Security Project — pfSense Deployment
         location: Togo
         start_date: 2024
@@ -60,8 +60,8 @@ cv:
         date: "2026-08-22"
         awarder: IPNET Cyber Club
         summary: Won a 24-hour non-stop CTF (lock picking, web arena, steganography without AI, code review, jeopardy CTF) as part of a 3-person team.
-      
-       - title: 1st Place - IPNET JPOPE
+
+      - title: 1st Place - IPNET JPOPE
         authors:
           - "[Magnim Grâce TCHANGAI](https://www.linkedin.com/in/magnim-gr%C3%A2ce-tchangai-6b3569345/)"
           - "[Yendoubouame Joseph NAKORE](https://www.linkedin.com/in/yendoubouame-joseph-nakore-a25413333/)"
@@ -73,7 +73,7 @@ cv:
           live in front of recruiters, industry partners, and the public at JPOPE,
           IPNET's flagship annual student showcase — and walked away with 1st prize
           in the Cybersecurity track.
-    
+
     Skills:
       - name: Systems & Networking
         level: Intermediate
@@ -107,7 +107,6 @@ cv:
         summary: Detailed French-language write-ups of Hack The Box machines, including a full RCE-to-root chain on the "DevHub" machine.
         highlights:
           - Currently developing Active Directory / Windows exploitation skills
-        level: 
 
     Interests:
       - name: Offensive Security
