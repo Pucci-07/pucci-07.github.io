@@ -1,16 +1,16 @@
 cv:
   name: TCHENDIE TCHAMIYE Lidao
   label: Cybersecurity Student | Aspiring Pentester & Red Teamer
-  email: "[tchendieyves@gmail.com]"
+  email: tchendieyves@gmail.com
   location: "Hédzranamoé - Lomé, Togo"
   image: ""
   summary: Togolese cybersecurity student fascinated by the offensive side of security, with a strong daily footing in the Linux world and a growing interest in cloud and DevOps. Aspiring Penetration Tester / Red Teamer / Cloud Security Engineer / System Administrator.
 
   social_networks:
     - network: LinkedIn
-      username: "TCHAMIYE Lidao TCHENDIE"
+      username: TCHAMIYE Lidao TCHENDIE
     - network: GitHub
-      username: "[À COMPLÉTER]"
+      username: Pucci-07
 
   sections:
     Education:
