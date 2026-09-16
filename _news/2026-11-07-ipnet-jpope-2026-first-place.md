@@ -12,4 +12,4 @@ This year was different. My team and I went in wanting to win — not just take 
 
 We took 1st place in the Cybersecurity track — and the 1,000,000 FCFA prize was a nice bonus, but the real reward was proving to ourselves we could go from "arbitrary Top 10" to "we came here to win."
 
-
+![Photo de l'équipe au JPOPE 2026](/assets/img/TEAM.jpeg) ![Photo du trophée JPOPE 2026](/assets/img/TROPHY.jpeg)
