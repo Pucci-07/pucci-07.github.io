@@ -1,7 +1,7 @@
 ---
 layout: post
 title: IPNET JPOPE 2026 — First Place
-date: 2026-09-13 22:21:00-0400
+date: 2026-09-13 12:00:00 +0000
 inline: false
 related_posts: false
 ---
