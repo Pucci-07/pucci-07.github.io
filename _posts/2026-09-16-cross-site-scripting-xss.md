@@ -1,0 +1,124 @@
+---
+layout: post
+title: "cross site scripting xss"
+date: 2026-09-16 12:00:00 +0000
+categories: [writeup]
+tags: [htb]
+---
+
+[[Hackviser Academy]]
+
+## Introduction
+
+### What is Cross-site Scripting (XSS)?
+
+**Cross-site Scripting (XSS)** is a type of security vulnerability commonly found in web-based applications and this vulnerability primarily relies on client-side code injection attacks. Attackers aim to execute malicious JavaScript code in the browsers of users visiting the web pages or applications by embedding these code snippets.
+
+The attack is triggered when users visit a web page or application containing the malicious code. The web page or application acts as a medium to execute the malicious scripts in the user's browser. XSS vulnerabilities are frequently detected on platforms that include forums, messaging interfaces, and comment fields where users provide input.
+
+### Effects of XSS Attacks
+
+Cross-site Scripting (XSS) attacks can lead to serious security threats such as **stealing user session cookies, leaking sensitive data, altering web page content, or performing unauthorized actions on the application**.
+
+Session Cookie Theft
+
+XSS attacks allow attackers to steal users' session cookies. **Cookies** store session information of users and are commonly used for automatic login to websites. When attackers gain access to these cookies, they can unauthorizedly access users' accounts and perform actions on their behalf.
+
+![](https://storage.hackviser.com/file/hackviser-prod/trainings/sections/images/ac167670-4d98-4a00-8709-281600231422/session-5c6cbcdac.webp)
+
+Leakage of Sensitive Data
+
+XSS attacks can lead to the leakage of sensitive information. Attackers can capture form data, credit card information, and other personal details through malicious scripts. Such data leaks can result in serious consequences such as fraud and identity theft.
+
+Modification of Web Page Content
+
+Attackers can use XSS to change the appearance and content of a web page. This can negatively impact users' experiences by presenting fake or malicious content to users, potentially misleading them. Additionally, it can harm corporate image and customer trust.
+
+Execution of Unauthorized Operations
+
+XSS attacks allow attackers to misuse users' permissions within web applications. For example, an attacker can use the victim's account to harm other users, add new administrators, delete or modify data, and perform unauthorized operations.
+
+Social Engineering Attacks
+
+XSS attacks can be used as part of broader social engineering campaigns. Attackers may try to deceive users by sending malicious links or messages that appear to come from a trusted source.
+
+Triggering of Other Security Vulnerabilities
+
+XSS vulnerabilities jeopardize the overall security of a website or application. These vulnerabilities can act as a gateway for other types of attacks, such as Cross-Site Request Forgery (CSRF).
+
+### Types of XSS Attacks
+
+XSS attacks are categorized into three main types:
+
+1. **Reflected XSS (Non-Persistent XSS)**: Occurs when data sent from a user is immediately reflected by a web application without proper filtering and then executed by the user's browser. Malicious scripts are usually sent via URL parameters and executed when the user opens the URL.
+    
+2. **Stored XSS (Persistent XSS)**: Happens when malicious scripts are stored in the web application's database and executed when other users view the affected content.
+    
+3. **DOM-based XSS (DOM XSS)**: Malicious scripts are executed directly by manipulating the Document Object Model (DOM) in the user's browser. Here, the attacker triggers the execution of a web application's client-side scripts by altering the DOM.
+    
+
+### Key Concepts
+
+**HTML (Hyper Text Markup Language)**: A standard markup language used to create web pages.
+
+```auto
+<html>
+    <head>
+        <title>Home</title>
+    </head>
+    <body>
+        <h1>Hello World!</h1>
+    </body>
+</html>
+```
+
+**JavaScript**: A programming language used to make web pages interactive. JavaScript plays a central role in writing and executing malicious scripts in XSS attacks.
+
+```auto
+alert('Hello World!');
+```
+
+**DOM (Document Object Model)**: A programming interface that represents an HTML document as a hierarchical tree structure, which allows interaction with the document using languages like JavaScript.
+
+**Payload**: In an XSS attack, the piece of malicious code intended to be executed by the browser.
+
+```auto
+<script>alert(1)</script>
+```
+
+**Content Security Policy (CSP)**: A security protocol that restricts the sources from which a web page can load scripts, helping to prevent XSS attacks.
+
+```auto
+Content-Security-Policy: script-src 'self' https://apis.example.com
+```
+
+This CSP rule allows loading scripts only from the same origin (self) and [https://apis.example.com](https://apis.example.com), thus preventing the loading of external malicious scripts.
+
+### Commonly Used JavaScript Functions and Objects in XSS Attacks
+
+|JavaScript Function/Object|Description|
+|---|---|
+|alert()|Displays a message box to the user.|
+|prompt()|Prompts the user for input and returns the entered value.|
+|confirm()|Displays a confirmation box to the user. The user can choose "OK" or "Cancel".|
+|eval()|Evaluates a string as JavaScript code and executes it. Unsafe for user inputs and may lead to vulnerabilities.|
+|fetch()|Sends an HTTP request to the specified URL and returns a Promise. The request result can be handled in the Promise chain.|
+|document.cookie|Provides access to the browser's cookies.|
+|innerHTML|Used to change the content of an HTML element.|
+|setTimeout()|Executes a specified function after a certain time interval.|
+|setInterval()|Repeatedly executes a specified function at certain time intervals.|
+|XMLHttpRequest|Used to exchange data with a server in the background.|
+|localStorage|Used to store persistent data in the browser.|
+|sessionStorage|Provides access to the browser's session storage.|
+
+### Commonly Used HTML Tags in XSS Attacks
+
+|HTML Tag|Description|
+|---|---|
+|<script>|Used to include JavaScript code in the page.|
+|<img>|Used to embed an image.|
+|<iframe>|Used to embed another web page into the current page.|
+|<a>|Used to create a hyperlink.|
+|<input>|Used to get user input.|
+|<textarea>|Used to get multi-line user input.|
+|<svg>|Used to create vector graphics.|

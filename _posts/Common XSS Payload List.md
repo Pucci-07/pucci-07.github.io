@@ -1,3 +1,0 @@
-
-[[Cross-site Scripting (XSS)]]
-
