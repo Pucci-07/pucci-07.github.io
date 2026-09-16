@@ -1,0 +1,142 @@
+MSFconsole peut gérer plusieurs modules en même temps. C'est l'une des nombreuses raisons pour lesquelles il offre à l'utilisateur une si grande flexibilité. Cela se fait à l'aide des `Sessions`, qui créent des interfaces de contrôle dédiées pour tous vos modules déployés.
+
+Une fois que plusieurs sessions sont créées, nous pouvons basculer entre elles et lier un module différent à l'une des sessions mises en arrière-plan pour l'exécuter dessus ou les transformer en jobs. Notez qu'une fois qu'une session est placée en arrière-plan, elle continuera à s'exécuter et notre connexion à l'hôte cible persistera. Les sessions peuvent cependant se terminer si un problème survient pendant l'exécution de la charge utile (payload), provoquant la rupture du canal de communication.
+
+---
+
+## Utiliser les Sessions
+
+Lors de l'exécution d'exploits ou de modules auxiliaires disponibles dans msfconsole, nous pouvons mettre la session en arrière-plan tant qu'ils forment un canal de communication avec l'hôte cible. Cela peut être fait soit en appuyant sur la combinaison de touches `[CTRL] + [Z]`, soit en tapant la commande `background` dans le cas des stages Meterpreter. Un message de confirmation nous sera alors demandé. Après avoir accepté, nous retournerons à l'invite de msfconsole (`msf6 >`) et pourrons immédiatement lancer un module différent.
+
+#### Lister les sessions actives
+
+Nous pouvons utiliser la commande `sessions` pour afficher nos sessions actuellement actives.
+
+        shellsession
+`msf6 exploit(windows/smb/psexec_psh) > sessions  Active sessions ===============    Id  Name  Type                     Information                 Connection   --  ----  ----                     -----------                 ----------   1         meterpreter x86/windows  NT AUTHORITY\SYSTEM @ MS01  10.10.10.129:443 -> 10.10.10.205:50501 (10.10.10.205)`
+
+#### Interagir avec une session
+
+Vous pouvez utiliser la commande `sessions -i [no.]` pour ouvrir une session spécifique.
+
+        shellsession
+`msf6 exploit(windows/smb/psexec_psh) > sessions -i 1 [*] Starting interaction with 1...  meterpreter >` 
+
+Ceci est particulièrement utile lorsque nous voulons exécuter un module supplémentaire sur un système déjà exploité avec un canal de communication stable et établi.
+
+Cela peut être fait en mettant en arrière-plan notre session actuelle, qui a été créée suite au succès du premier exploit, en recherchant le second module que nous souhaitons exécuter, et, si le type de module sélectionné le permet, en sélectionnant le numéro de la session sur laquelle le module doit être exécuté. Ceci peut être fait depuis le menu `show options` du second module.
+
+Généralement, ces modules se trouvent dans la catégorie `post`, faisant référence aux modules de Post-Exploitation. Les principaux archétypes de modules dans cette catégorie sont les collecteurs d'identifiants, les suggéreurs d'exploits locaux et les scanners de réseau interne.
+
+---
+
+## Jobs
+
+Si, par exemple, nous exécutons un exploit actif sur un port spécifique et que nous avons besoin de ce port pour un module différent, nous ne pouvons pas simplement terminer la session en utilisant `[CTRL] + [C]`. Si nous le faisions, nous verrions que le port serait toujours utilisé, ce qui affecterait notre utilisation du nouveau module. À la place, nous devrions utiliser la commande `jobs` pour consulter les tâches actives s'exécutant en arrière-plan et terminer les anciennes afin de libérer le port.
+
+D'autres types de tâches au sein des sessions peuvent également être convertis en jobs pour s'exécuter de manière transparente en arrière-plan, même si la session se termine ou disparaît.
+
+#### Afficher le menu d'aide de la commande Jobs
+
+Nous pouvons afficher le menu d'aide de cette commande, comme pour les autres, en tapant `jobs -h`.
+
+        shellsession
+`msf6 exploit(multi/handler) > jobs -h Usage: jobs [options]  Active job manipulation and interaction.  OPTIONS:      -K        Terminate all running jobs.     -P        Persist all running jobs on restart.     -S <opt>  Row search filter.     -h        Help banner.     -i <opt>  Lists detailed information about a running job.     -k <opt>  Terminate jobs by job ID and/or range.     -l        List all running jobs.     -p <opt>  Add persistence to job by job ID     -v        Print more detailed info.  Use with -i and -l`
+
+#### Afficher le menu d'aide de la commande Exploit
+
+Lorsque nous lançons un exploit, nous pouvons l'exécuter en tant que job en tapant `exploit -j`. Selon le menu d'aide de la commande `exploit`, ajouter `-j` à notre commande, au lieu de simplement `exploit` ou `run`, va « l'exécuter dans le contexte d'un job » ("run it in the context of a job").
+
+        shellsession
+`msf6 exploit(multi/handler) > exploit -h Usage: exploit [options]  Launches an exploitation attempt.  OPTIONS:      -J        Force running in the foreground, even if passive.     -e <opt>  The payload encoder to use.  If none is specified, ENCODER is used.     -f        Force the exploit to run regardless of the value of MinimumRank.     -h        Help banner.     -j        Run in the context of a job.      <SNIP`
+
+#### Lancer un exploit en tant que job d'arrière-plan
+
+        shellsession
+`msf6 exploit(multi/handler) > exploit -j [*] Exploit running as background job 0. [*] Exploit completed, but no session was created.  [*] Started reverse TCP handler on 10.10.14.34:4444`
+
+#### Lister les jobs en cours
+
+Pour lister tous les jobs en cours, nous pouvons utiliser la commande `jobs -l`. Pour terminer un job spécifique, regardez son numéro d'index et utilisez la commande `kill [index no.]`. Utilisez la commande `jobs -K` pour terminer tous les jobs en cours.
+
+        shellsession
+`msf6 exploit(multi/handler) > jobs -l  Jobs ====   Id  Name                    Payload                    Payload opts  --  ----                    -------                    ------------  0   Exploit: multi/handler  generic/shell_reverse_tcp  tcp://10.10.14.34:4444`
+
+Prochaine étape, nous travaillerons avec la très puissante charge utile `Meterpreter`.
+
+![[Pasted image 20260912005734.png]] 
+
+commencon avec un scan nmap meme si on sait que un port web est ouvert 
+
+![[Pasted image 20260912010029.png]]
+
+on vois que dans notre scan  nmap le paramètres http_title est  : elFinder 2.1.x source version with PHP connector 
+donc le nom de l'appli  est elFinder 
+
+![[Pasted image 20260912010254.png]]
+
+une fois msfconsole lancer on va filtrer la recherche avec le mot clé  elFinder  et ensuite checker les options d'un payload intéressant 
+
+![[Pasted image 20260912010545.png]] 
+on a les payloads   3 et 4 qui sont plutots interessants 
+on va checker sa pour voir 
+
+![[Pasted image 20260912011243.png]]
+
+au 1 : set  lhost tun0 nous permet de specifier l'interface et en meme temps l'interface sur laquelle initier la connection avec l'hote 
+
+au 2 : set rhost 10.129.206.129 nous permet de definir la cible pour ce type d'exploit 
+au 3 : options qui nous permet de voir les différent variables ou  configurations possible pour ce type d'exploit 
+
+au 4 : check  nous permet de voir si l'hote ou les configurations faite sont compatibles avec l'exploit déliver  , et la répose  était positive 
+
+![[Pasted image 20260912011902.png]]
+
+
+![[Pasted image 20260912012025.png]]
+
+au 1 : on a la commande qui permet l'exploitation c'est elle qui déclenche le processus d'exploit 
+
+au 2 : on a l'ensembe des sessions , des payloads et communications faites entre la cible et l'attaquant 
+
+au 3 ; on un shell meterpretrer qui voudrait signifier que l'exploit a marcher sur le système cible  et on pourra avoir un shell système en tapant shell dans le meterpreter 
+
+mais cette fois ci on a utiliser getuid qui  est une commande meterpreter qui est envoyer à la cible de cette session et non ce n'est pas un commande systèeme à proprement dit 
+
+et grace à getuid on a pu avoir le nom de l'utilsateur avec qui on c'est connecté 
+
+![[Pasted image 20260912012640.png]]
+
+pour cette partit on a besoin d'un accès au shell_système  cela peut ce faire avec la commande shell du meterpretrer
+
+![[Pasted image 20260912015757.png]]
+
+on est sur la version 1.8.31 de sudo  
+une recherche montre qu'on fait fasse à la CVE  : CVE-2021-3156 
+
+une rapide recherche sur msfconsole donne : 
+
+![[Pasted image 20260912020247.png]]
+
+les info sur les paramètres  du module montre  : 
+
+![[Pasted image 20260912020453.png]]
+
+donc on a besoin d'une session et d'un dossier de la cible ou on peut écrire 
+
+![[Pasted image 20260912020611.png]]
+
+nous notre session est la session 4 donc on doit la mettre à jour 
+
+![[Pasted image 20260912020947.png]]
+
+au 1 : on a defini la session cible à utiliser 
+au 2 : c'est l'addresse ip et l'interface à utiliser pour la communication avec la cible 
+au 3 ; c'est le port sur le quel on va écouter les connection entrante  ; c'est principalement pour éviter le conflits de port car la session 4 est sur le port 4444
+
+![[Pasted image 20260912021354.png]]
+
+une fois lancer on eut des warnings mais l'obtention d'un meterpreter et de l'execution de la commande getuid qui nous permet d'avoir l'utilisateur avec lequel on c'est logé montre que on a un accés root sur le système cible donc on peut chercher le flag maintenant 
+
+
+GG !!!!!!!!
