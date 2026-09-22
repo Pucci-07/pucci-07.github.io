@@ -2,7 +2,7 @@
 # Site settings
 # -----------------------------------------------------------------------------
 
-title: My personal Blog
+title: Doom personal Blog
 first_name: Tchamiye
 middle_name: Lidao
 last_name: TCHENDIE
@@ -136,7 +136,7 @@ bing_site_verification: # out your bing-site-verification ID (Bing Webmaster)
 # Blog
 # -----------------------------------------------------------------------------
 
-blog_name: Pucci-07 blog # blog_name will be displayed in your blog page
+blog_name: Doom blog # blog_name will be displayed in your blog page
 blog_description: A simple blog for a cyber-security student enjoyer
 permalink: /blog/:year/:title/
 lsi: false # produce an index for related posts
