@@ -2,24 +2,24 @@
 layout: post
 title: "Basic SQL Injection — Hackviser Lab"
 date: 2026-09-27 12:00:00
-description: Contournement d'une page de login vulnérable à l'injection SQL sur un lab Hackviser, avec récupération de l'email d'un utilisateur cible.
+description: Bypassing a SQL-injection-vulnerable login page on a Hackviser lab, retrieving a target user's email address.
 tags: [writeup, sqli, hackviser, web]
 categories: [Write-ups]
 giscus_comments: true
 related_posts: false
 ---
 
-## L'objectif
+## The objective
 
-Le lab Hackviser **Basic SQL Injection** contient une vulnérabilité d'injection SQL dans la fonction de login. Le but est de bypasser la page de connexion pour retrouver l'adresse email de l'utilisateur nommé **Sky Raincin**.
+The Hackviser **Basic SQL Injection** lab contains a SQL injection vulnerability in the login function. The goal is to bypass the login page to retrieve the email address of the user named **Sky Raincin**.
 
-Une fois sur l'URL du site, on arrive sur cette interface :
+Once on the site's URL, this interface is presented:
 
 {% include figure.liquid path="assets/img/sqli-hackviser/01-login-page.png" class="img-fluid rounded z-depth-1" %}
 
-## Premier payload — échec
+## First payload — failure
 
-On teste un payload classique d'injection dans le champ Username :
+A classic injection payload is tried in the Username field:
 
 ```
 ' OR 1=1--
@@ -27,49 +27,49 @@ On teste un payload classique d'injection dans le champ Username :
 
 {% include figure.liquid path="assets/img/sqli-hackviser/02-payload-attempt.png" class="img-fluid rounded z-depth-1" %}
 
-La réponse du serveur :
+The server's response:
 
 {% include figure.liquid path="assets/img/sqli-hackviser/03-wrong-credentials.png" class="img-fluid rounded z-depth-1" %}
 
-**Wrong username or password** — le serveur semble traiter notre entrée comme une simple chaîne de caractères plutôt que comme une injection de commande SQL.
+**Wrong username or password** — the server appears to treat the input as a plain string rather than as SQL injection.
 
-## Diagnostic — le mauvais guillemet
+## Diagnosis — the wrong quote character
 
-La cause est le caractère utilisé à côté du paramètre injecté : en SQL, l'apostrophe droite `'` n'est **pas équivalente** à une apostrophe typographique `'`. Autrement dit, définir une chaîne comme `'ma chaîne'` fonctionne, mais `'ma chaîne'` (avec une apostrophe courbe) est interprété comme du texte littéral, pas comme une syntaxe SQL.
+The cause is the character used next to the injected parameter: in SQL, a straight apostrophe `'` is **not equivalent** to a typographic (curly) apostrophe `'`. In other words, defining a string as `'my string'` works, but `'my string'` (with a curly apostrophe) gets interpreted as literal text, not SQL syntax.
 
-Dans notre cas, le payload initial utilisait la mauvaise apostrophe, donc `' OR 1=1--` était interprété comme une chaîne de caractères inoffensive, d'où l'erreur "wrong username or password".
+In this case, the initial payload used the wrong apostrophe, so `' OR 1=1--` was interpreted as a harmless string, hence the "wrong username or password" error.
 
-Le payload corrigé, avec la bonne apostrophe droite :
+The corrected payload, with the proper straight apostrophe:
 
 ```
 'OR 1=1 - -
 ```
 
-Le résultat :
+The result:
 
 {% include figure.liquid path="assets/img/sqli-hackviser/04-500-error.png" class="img-fluid rounded z-depth-1" %}
 
-Cette fois, ça a partiellement marché, mais on tombe sur une erreur **500 Internal Server Error**. Hypothèse : le serveur de base de données n'interprète pas correctement la syntaxe de commentaire envoyée. Ce qui varie généralement d'un moteur SQL à l'autre, ce n'est pas toute la syntaxe, mais surtout la syntaxe des **commentaires**. On teste donc avec `#` à la place de `--` :
+This time it partially worked, but a **500 Internal Server Error** is returned. Hypothesis: the database server isn't interpreting the comment syntax correctly. What usually varies between SQL engines isn't the entire syntax, but mainly the **comment** syntax. So `#` is tried instead of `--`:
 
 ```
 'OR 1=1 #
 ```
 
-## Succès
+## Success
 
 {% include figure.liquid path="assets/img/sqli-hackviser/05-hash-payload.png" class="img-fluid rounded z-depth-1" %}
 
 {% include figure.liquid path="assets/img/sqli-hackviser/06-profile-result.png" class="img-fluid rounded z-depth-1" %}
 
-On obtient le profil de l'utilisateur cible avec son adresse email : **sraincin0@moonfruit.hv**.
+The target user's profile is obtained, along with their email address: **sraincin0@moonfruit.hv**.
 
-**Note technique** : en MySQL, le commentaire `--` doit obligatoirement être suivi d'un espace pour être reconnu comme tel — sans cet espace, il est ignoré, d'où l'erreur 500 (requête malformée). Le commentaire `#`, lui, n'a pas cette contrainte, ce qui explique le succès immédiat avec ce second payload.
+**Technical note**: in MySQL, the `--` comment must be followed by a space to be recognized as such — without that space, it's ignored, hence the 500 error (malformed query). The `#` comment doesn't have that constraint, which explains the immediate success with the second payload.
 
-## Recommandations
+## Recommendations
 
-- **Requêtes préparées / paramétrées** (PDO, prepared statements) pour éliminer structurellement l'injection.
-- Utilisation d'un **ORM** qui échappe automatiquement les entrées utilisateur.
-- **Principe du moindre privilège** sur le compte de base de données utilisé par l'application (éviter un compte avec droits admin).
-- **WAF** en couche de défense additionnelle — mais jamais en remplacement de la correction du code applicatif.
-- **Validation/sanitization** des entrées côté serveur, en privilégiant une **whitelist** plutôt qu'une blacklist.
-- Ne jamais passer directement des paramètres saisis par l'utilisateur dans une requête SQL construite par concaténation de chaînes.
+- **Prepared / parameterized statements** (PDO, prepared statements) to structurally eliminate injection.
+- Use of an **ORM** that automatically escapes user input.
+- **Principle of least privilege** on the database account used by the application (avoid an account with admin rights).
+- **WAF** as an additional defense layer — but never as a replacement for fixing the application code.
+- **Input validation/sanitization** on the server side, favoring a **whitelist** over a blacklist.
+- Never pass user-supplied parameters directly into a SQL query built through string concatenation.
