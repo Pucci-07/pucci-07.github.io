@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href='#'>Affiliations</a>. Address. Contacts. Motto. Etc.
+subtitle: Cybersecurity student · Offensive security, Linux &amp; Cloud · Looking for an internship
 
 profile:
   align: right
@@ -12,7 +12,7 @@ profile:
     <p>Student at IPNET INSTITUTE OF TECHNOLOGY</p>
     <p>Lomé, Hedzranawoé</p>
 
-selected_papers: true # includes a list of papers marked as "selected={true}"
+selected_papers: false # includes a list of papers marked as "selected={true}"
 social: true # includes social icons at the bottom of the page
 
 announcements:
@@ -43,6 +43,3 @@ I'm a Togolese cybersecurity student, fascinated by the world of computers and, 
   <li><i class="fa-solid fa-cloud"></i>&nbsp; Cloud Security Engineer</li>
   <li><i class="fa-solid fa-server"></i>&nbsp; System Administrator</li>
 </ul>
-
-My social media connections:
-[Linkedin](https://www.linkedin.com/in/tchamiye-lidao-tchendie-881228374/)

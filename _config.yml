@@ -7,14 +7,14 @@ first_name: Tchamiye
 middle_name: Lidao
 last_name: TCHENDIE
 contact_note: >
-  You can even add a little note about which of these is the best way to reach you.
+  The best way to reach me is by email or LinkedIn. I'm currently looking for a cybersecurity internship.
 description: > # the ">" symbol means to ignore newlines until "footer_text:"
-  A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
+  Cybersecurity student portfolio: write-ups (Hack The Box, TryHackMe, labs), projects and notes on offensive security, Linux and cloud.
 footer_text: >
   Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
   Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
   Photos from <a href="https://unsplash.com" target="_blank">Unsplash</a>.
-keywords: jekyll, jekyll-theme, academic-website, portfolio-website # add your own keywords or leave empty
+keywords: cybersecurity, pentest, red team, ctf, write-ups, hack the box, linux, cloud, portfolio # add your own keywords or leave empty
 lang: en, fr # the language of your site (for example: en, fr, cn, ru, etc.)
 icon: 👾 # the emoji used as the favicon (alternatively, provide image name in /assets/img/)
 apple_touch_icon: # image name in /assets/img/ (or a rooted path / absolute URL) used for iOS home-screen bookmarks; needs a real 180x180 PNG, since Safari ignores the emoji favicon above. Left empty, iOS falls back to a screenshot of the page.

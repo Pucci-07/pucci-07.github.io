@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Honeypot project
-description: with background image
+description: AI-powered honeypot that captured a real attacker session — IPNET JPOPE 2026, first place
 img: assets/img/wallhaven-mpyxm1.png
 importance: 1
 category: work
