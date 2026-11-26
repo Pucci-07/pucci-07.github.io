@@ -62,4 +62,3 @@ Beyond the technical side, this project mostly showed us how much a security sys
 - **The ultimate validation is production.** No amount of local testing replaces the first real attacker session ever captured. That's the moment that confirms the architecture — however winding the path to get there — is finally doing its job.
 
 This project is far from finished, but it captures a broader truth about working in cybersecurity: the best architectures rarely arrive fully formed from a spec sheet. They get built against real-world constraints, one pragmatic decision at a time.
-
