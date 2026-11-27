@@ -1,13 +1,24 @@
 /*******************************************************************************
- * Cyber theme: electric blue and crimson accents on a dark, readable canvas.
+ * Cyber accents adapt to light and dark themes while keeping readable contrast.
  ******************************************************************************/
 
-:root,
+:root {
+  --cy-blue: #00749b;
+  --cy-red: #b4233b;
+  --cy-edge: linear-gradient(90deg, var(--cy-blue), var(--cy-red));
+  --cy-image-start: #eaf6fa;
+  --cy-image-middle: #f4f7fb;
+  --cy-image-end: #faedf0;
+}
+
 html[data-theme="dark"] {
   color-scheme: dark;
   --cy-blue: #42c8f5;
   --cy-red: #ff5b70;
   --cy-edge: linear-gradient(90deg, var(--cy-blue), var(--cy-red));
+  --cy-image-start: #0b2740;
+  --cy-image-middle: #10152a;
+  --cy-image-end: #251326;
 
   --global-bg-color: #07111f;
   --global-code-bg-color: #0c1a2e;
@@ -26,6 +37,15 @@ html[data-theme="dark"] {
   --global-back-to-top-text-color: #06101a;
   --global-newsletter-bg-color: #0c1a2e;
   --global-newsletter-text-color: #e4edf8;
+}
+
+html[data-theme="light"] {
+  --global-theme-color: var(--cy-blue);
+  --global-hover-color: var(--cy-blue);
+  --global-hover-text-color: #ffffff;
+  --global-highlight-color: var(--cy-red);
+  --global-back-to-top-bg-color: rgba(0, 116, 155, 0.94);
+  --global-back-to-top-text-color: #ffffff;
 }
 
 html,
@@ -459,7 +479,7 @@ a {
     place-items: center;
     background:
       radial-gradient(ellipse at 75% 15%, color-mix(in srgb, var(--cy-red) 25%, transparent), transparent 55%),
-      linear-gradient(135deg, #0b2740, #10152a 60%, #251326);
+      linear-gradient(135deg, var(--cy-image-start), var(--cy-image-middle) 60%, var(--cy-image-end));
 
     img {
       width: 100%;

@@ -153,6 +153,32 @@ test("navbar search button opens modal and toggle buttons use pointer cursor", a
   expect(themeCursor).toBe("pointer");
 });
 
+test("theme selector applies the cyber palette across pages", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === "mobile", "theme controls are collapsed under the mobile menu");
+
+  await preparePage(page, "light");
+  await page.goto("/al-folio/projects/", { waitUntil: "networkidle" });
+
+  const lightPalette = await page.evaluate(() => ({
+    background: getComputedStyle(document.documentElement).getPropertyValue("--global-bg-color").trim(),
+    card: getComputedStyle(document.querySelector(".projects .card")).backgroundColor,
+    accent: getComputedStyle(document.documentElement).getPropertyValue("--cy-blue").trim(),
+  }));
+
+  await page.click("#light-toggle");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+
+  const darkPalette = await page.evaluate(() => ({
+    background: getComputedStyle(document.documentElement).getPropertyValue("--global-bg-color").trim(),
+    card: getComputedStyle(document.querySelector(".projects .card")).backgroundColor,
+    accent: getComputedStyle(document.documentElement).getPropertyValue("--cy-blue").trim(),
+  }));
+
+  expect(darkPalette.background).not.toBe(lightPalette.background);
+  expect(darkPalette.card).not.toBe(lightPalette.card);
+  expect(darkPalette.accent).not.toBe(lightPalette.accent);
+});
+
 test("related posts are wrapped in a valid list", async ({ page }) => {
   await preparePage(page, "light");
   await page.goto("/al-folio/blog/2023/tables/", { waitUntil: "networkidle" });
