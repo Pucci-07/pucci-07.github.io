@@ -5,6 +5,11 @@ date: 2026-09-27 12:00:00
 description: Bypassing a SQL-injection-vulnerable login page on a Hackviser lab, retrieving a target user's email address.
 tags: [writeup, sqli, hackviser, web]
 categories: [Write-ups]
+writeup_id: hackviser-basic-sqli
+writeup_platform: Hackviser
+writeup_title: Basic SQL Injection
+writeup_language: en
+writeup_image: assets/img/sqli-hackviser/01-login-page.png
 giscus_comments: true
 related_posts: false
 ---
