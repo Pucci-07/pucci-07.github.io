@@ -34,4 +34,4 @@
 @use "typograms";
 
 // Local override: cyber theme, loaded last so it wins over the base theme.
-@use "cyber";
+@use "./cyber";

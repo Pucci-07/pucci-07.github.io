@@ -5,6 +5,11 @@ date: 2026-08-02 15:35:00
 description: RCE on MCPJam Inspector, lateral movement via Jupyter/websocat, and root privilege escalation through a hidden endpoint on an internal MCP server.
 tags: [htb, writeup, linux, mcp, rce, privesc]
 categories: [Write-ups]
+writeup_id: htb-devhub
+writeup_platform: Hack The Box
+writeup_title: DevHub (Season 11)
+writeup_language: en
+writeup_image: assets/img/devhub-writeups/01-htb-info-card.png
 giscus_comments: true
 related_posts: false
 ---

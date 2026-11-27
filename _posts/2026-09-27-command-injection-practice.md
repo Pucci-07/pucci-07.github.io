@@ -5,6 +5,11 @@ date: 2026-09-27 12:00:00
 description: Bypassing a blacklist-based WAF on a vulnerable DNS lookup tool to achieve command injection and read source code.
 tags: [writeup, command-injection, waf-bypass, linux]
 categories: [Write-ups]
+writeup_id: practice-dns-lookup
+writeup_platform: Practice Labs
+writeup_title: DNS Lookup Tool
+writeup_language: en
+writeup_image: assets/img/command-injection-practice/01-target-site.png
 giscus_comments: true
 related_posts: false
 ---
